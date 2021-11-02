@@ -1,7 +1,7 @@
 import re
 
-from youtube_playlist_downloader.database.db_track import DBTrack
-from youtube_playlist_downloader.usefull.functions import feat_finder, without_feat, artist_splitter, artist_splitter_runtime
+from app.database.db_track import DBTrack
+from app.usefull.functions import feat_finder, without_feat, artist_splitter, artist_splitter_runtime
 
 
 class SpotifyTrack:

@@ -1,5 +1,5 @@
 import re
-from youtube_playlist_downloader.usefull.functions import without_feat, artist_splitter_runtime, feat_finder
+from app.usefull.functions import without_feat, artist_splitter_runtime, feat_finder
 
 
 def normalizer_of_title(raw_title: str):

@@ -1,5 +1,5 @@
 import sqlite3 as sql
-from youtube_playlist_downloader.database.db_track import DBTrack
+from app.database.db_track import DBTrack
 
 
 class TracksTable:

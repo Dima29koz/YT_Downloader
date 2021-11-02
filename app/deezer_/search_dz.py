@@ -1,9 +1,9 @@
 import deezer
-from youtube_playlist_downloader.usefull.exceptions import SearchingError
-from youtube_playlist_downloader.database.db_track import DBTrack
-from youtube_playlist_downloader.deezer_.deezer_track import DeezerTrack
-from youtube_playlist_downloader.usefull.functions import soft_normalized, artist_splitter_runtime
-from youtube_playlist_downloader.usefull.search_rating_calculator import SRCalculator
+from app.usefull.exceptions import SearchingError
+from app.database.db_track import DBTrack
+from app.deezer_.deezer_track import DeezerTrack
+from app.usefull.functions import soft_normalized, artist_splitter_runtime
+from app.usefull.search_rating_calculator import SRCalculator
 
 dz = deezer.Client()
 

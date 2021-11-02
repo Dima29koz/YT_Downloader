@@ -3,10 +3,10 @@ from ytmusicapi.ytmusic import YTMusic
 from pytube import YouTube
 from pytube.exceptions import VideoUnavailable
 
-from youtube_playlist_downloader.youtube.youtube_track import YouTubeMusicTrack
-from youtube_playlist_downloader.database.db_track import DBTrack
-from youtube_playlist_downloader.usefull.functions import normalized, artist_splitter_runtime
-from youtube_playlist_downloader.usefull.exceptions import SearchingError
+from app.youtube.youtube_track import YouTubeMusicTrack
+from app.database.db_track import DBTrack
+from app.usefull.functions import normalized, artist_splitter_runtime
+from app.usefull.exceptions import SearchingError
 
 ytm = YTMusic()
 

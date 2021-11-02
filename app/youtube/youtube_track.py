@@ -1,5 +1,5 @@
-from youtube_playlist_downloader.usefull.functions import artist_splitter, artist_fixer, feat_finder
-from youtube_playlist_downloader.database.db_track import DBTrack
+from app.usefull.functions import artist_splitter, artist_fixer, feat_finder
+from app.database.db_track import DBTrack
 
 
 class YouTubeMusicTrack:

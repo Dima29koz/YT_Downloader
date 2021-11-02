@@ -1,4 +1,4 @@
-from youtube_playlist_downloader.usefull.functions import feat_finder
+from app.usefull.functions import feat_finder
 
 
 class DeezerTrack:

@@ -2,7 +2,7 @@ from typing import Optional, List
 
 from ytmusicapi.ytmusic import YTMusic
 from pytube import YouTube
-from youtube_playlist_downloader.usefull.functions import feat_finder
+from app.usefull.functions import feat_finder
 import re
 
 ytm = YTMusic()

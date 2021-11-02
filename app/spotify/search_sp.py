@@ -2,9 +2,9 @@ import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 from typing import List
 
-from youtube_playlist_downloader.spotify.spotify_track import SpotifyTrack
-from youtube_playlist_downloader.database.db_track import DBTrack
-from youtube_playlist_downloader.usefull.functions import without_feat, soft_normalized
+from app.spotify.spotify_track import SpotifyTrack
+from app.database.db_track import DBTrack
+from app.usefull.functions import without_feat, soft_normalized
 
 spotify = spotipy.Spotify(
             client_credentials_manager=SpotifyClientCredentials('522f24ada7e8409fb7ad667b708c3bbb',
