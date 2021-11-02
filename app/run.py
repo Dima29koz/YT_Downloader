@@ -1,9 +1,11 @@
+from typing import List
+
 from app.database.database import TracksTable
 from app.spotify.search_sp import SpSearcher
 from app.youtube.search_ytm import playlist_getter, YTMSearcher
 from app.database.db_track import DBTrack
 from app.usefull.exceptions import SearchingError
-from app.youtube.youtube_track import YouTubeMusicTrack
+from app.youtube.youtube_music_track import YouTubeMusicTrack
 from app.deezer_.search_dz import DZSearcher
 
 
@@ -36,7 +38,7 @@ def search_on_spotify(db_track: DBTrack):
         return False
 
 
-def show_data_sp(data: list[DBTrack]):
+def show_data_sp(data: List[DBTrack]):
     err_counter = 0
     for i, track in enumerate(data[:100]):
         # if track.title.find('Dusk Till Dawn') != -1:
@@ -49,13 +51,13 @@ def show_data_sp(data: list[DBTrack]):
     print(err_counter)
 
 
-def show_data(data: list[DBTrack]):
+def show_data(data: List[DBTrack]):
     for i, track in enumerate(data):
         if track.title.find('Champion') != -1:
             print(i, track.get())
 
 
-def search_dz(data: list[DBTrack]):
+def search_dz(data: List[DBTrack]):
     """
 
     Ищет трек на Deezer если находит то что нужно, заменяет свои данные
