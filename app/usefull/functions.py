@@ -1,6 +1,16 @@
 import re
 
 
+def calc_duration(duration: str):
+    dur = duration.split(':')
+    dur.reverse()
+    k = [1, 60, 3600]
+    res = 0
+    for i, elem in enumerate(dur[:3]):
+        res += int(elem) * k[i]
+    return res
+
+
 def feat_finder(string: str):
     """
     ->"abra (feat. (q)art1, art2) cadabra (123)"

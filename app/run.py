@@ -1,22 +1,27 @@
-from typing import List
-
 from app.database.database import TracksTable
 from app.spotify.search_sp import SpSearcher
-from app.youtube.search_ytm import playlist_getter, YTMSearcher
-from app.database.db_track import DBTrack
 from app.usefull.exceptions import SearchingError
+from app.youtube.yt_handler import YTMSearcher
+from app.database.db_track import DBTrack
+from app.youtube import exceptions as ex
 from app.youtube.youtube_music_track import YouTubeMusicTrack
 from app.deezer_.search_dz import DZSearcher
 
 
-def add_playlist_to_db(table: TracksTable, playlist_id):
+def add_playlist_to_db(table: TracksTable, playlist_id: str):
     with open('Unavailable_videos.txt', 'a', encoding='utf-8') as log:
-        for i, track in enumerate(playlist_getter(playlist_id)):
+        yt = YTMSearcher()
+        for i, track in enumerate(yt.get_tracks_from_playlist(playlist_id)):
             if not table.contains_id(track.track_id):
                 try:
-                    table.add_tracks(YTMSearcher(track).ytm_search_result())
-                except SearchingError:
+                    song_video = yt.search_ytm_song(track)
+                except ex.SearchingError:
                     log.write(str(track) + '\n')
+                else:
+                    res = [track.to_db_track(state=0)]
+                    if song_video != track:
+                        res.append(song_video.to_db_track(state=1))
+                    table.add_tracks(res)
             print(f"Added {i+1} tracks...")
 
 
@@ -38,7 +43,7 @@ def search_on_spotify(db_track: DBTrack):
         return False
 
 
-def show_data_sp(data: List[DBTrack]):
+def show_data_sp(data: list[DBTrack]):
     err_counter = 0
     for i, track in enumerate(data[:100]):
         # if track.title.find('Dusk Till Dawn') != -1:
@@ -51,13 +56,12 @@ def show_data_sp(data: List[DBTrack]):
     print(err_counter)
 
 
-def show_data(data: List[DBTrack]):
+def show_data(data: list[DBTrack]):
     for i, track in enumerate(data):
-        if track.title.find('Champion') != -1:
-            print(i, track.get())
+        print(i, track.get())
 
 
-def search_dz(data: List[DBTrack]):
+def search_dz(data: list[DBTrack]):
     """
 
     Ищет трек на Deezer если находит то что нужно, заменяет свои данные

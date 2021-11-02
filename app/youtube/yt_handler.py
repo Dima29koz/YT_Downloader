@@ -13,18 +13,19 @@ class YTMSearcher:
         for track in playlist['tracks']:
             yield YouTubeMusicTrack(track)
 
-    def get_expanded_playlist(self, playlist_id: str):
-        for track in self.get_tracks_from_playlist(playlist_id):
-            found_track = self.search_ytm_song(track)
-            print(track)
-            print(found_track)
-            print('---------------------------------')
+    def get_song_videos(self, track: YouTubeMusicTrack):
+        found_track = self.search_ytm_song(track)
+        res = [track]
+        if found_track and found_track != track:
+            res.append(track)
+        return res
 
-    def search_ytm_song(self, track: YouTubeMusicTrack) -> YouTubeMusicTrack | None:
+    def search_ytm_song(self, track: YouTubeMusicTrack) -> YouTubeMusicTrack:
         """
         Возвращает результат поиска на YouTubeMusic
 
         :return: YouTubeMusicTrack or None
+        :raise SearchingError: если не удалось ничего найти
         """
         query_value = [
             (track.track_id, True),
@@ -41,7 +42,7 @@ class YTMSearcher:
                 ytm_track = YouTubeMusicTrack(search_result)
                 if track.is_equal(ytm_track):
                     return ytm_track
-        return None
+        raise SearchingError
 
     @staticmethod
     def convert_to_ytm_track(search_result: dict):

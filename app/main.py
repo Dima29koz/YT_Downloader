@@ -1,13 +1,12 @@
 from app.database.database import TracksTable
 from youtube.yt_handler import YTMSearcher
+from app.run import add_playlist_to_db, show_data
 
 
 def main(playlist_id: str):
-    # table = TracksTable()
-    yt = YTMSearcher()
-    yt.get_expanded_playlist(playlist_id)
+    table = TracksTable()
     # add_playlist_to_db(table, playlist_id)
-    # show_data(table_.get_all_data())
+    show_data(table.get_all_data())
     # show_data_sp(table_.get_data_by_param('search_result', 1))
     # search_dz(table_.get_data_by_param('search_result', 1))
     # show_data(table_.get_data_by_param('search_result', 1))

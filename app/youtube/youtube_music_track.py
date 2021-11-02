@@ -1,7 +1,9 @@
 from pytube import YouTube
 from pytube.exceptions import VideoUnavailable
 
-from app.usefull.functions import normalized, artist_splitter_runtime
+from app.database.db_track import DBTrack
+from app.usefull.functions import normalized, artist_splitter_runtime, calc_duration, feat_finder, artist_splitter, \
+    artist_fixer
 
 SEP = ' -|- '
 
@@ -14,7 +16,10 @@ class YouTubeMusicTrack:
         self.artists: list = track['artists']  # 'artists': [{'name': 'STARSET', 'id': 'UCzYd1EYoMbG8tFWQ69Odi4Q'}]
         self.album: str = str(track['album']['name']) if track['album'] else ''
         self.cover_art: str = track['thumbnails'][-1]['url']
-        self.duration: str = track['duration']  # 'duration': '3:16'
+        try:
+            self.duration: int = calc_duration(track['duration'])
+        except KeyError:
+            self.duration: int = 0
         self.meta_name: str = ''
         self.meta_artist: str = ''
 
@@ -107,20 +112,21 @@ class YouTubeMusicTrack:
         return self.track_id == other.track_id
 
     def __str__(self):
-        return self.track_id + SEP + self.title + SEP + self.get_artists_names_str() + SEP + self.album
+        return self.track_id + SEP + self.title + SEP + self.get_artists_names_str() + SEP + self.album \
+               + SEP + str(self.duration)
 
-    # def to_db_track(self, state):
-    #     norm_title = self.title.replace('[', '(').replace(']', ')')
-    #     feat = feat_finder(norm_title)
-    #     if feat != '':
-    #         title = norm_title.replace(feat, '').strip()
-    #         feat_arts = feat.replace('feat.', '')[1:-1]
-    #     else:
-    #         title = norm_title
-    #         feat_arts = ''
-    #     return DBTrack(track_id=self.track_id,
-    #                    state=state,
-    #                    title=title,
-    #                    artists=', '.join(artist_splitter(artist_fixer(self.artists_list) + [feat_arts])),
-    #                    album=self.album,
-    #                    cover_art=self.cover_art)
+    def to_db_track(self, state):  # todo
+        norm_title = self.title.replace('[', '(').replace(']', ')')
+        feat = feat_finder(norm_title)
+        if feat != '':
+            title = norm_title.replace(feat, '').strip()
+            feat_arts = feat.replace('feat.', '')[1:-1]
+        else:
+            title = norm_title
+            feat_arts = ''
+        return DBTrack(track_id=self.track_id,
+                       state=state,
+                       title=title,
+                       artists=', '.join(artist_splitter(artist_fixer(self.get_artists_names()) + [feat_arts])),
+                       album=self.album,
+                       cover_art=self.cover_art)
