@@ -8,16 +8,33 @@ class YTMSearcher:
     def __init__(self):
         self.ytm = YTMusic()
 
-    def get_tracks_from_playlist(self, playlist_id: str):
+    def get_track_list_from_playlist(self, playlist_id: str):
         playlist = self.ytm.get_playlist(playlist_id, limit=2000)
         for track in playlist['tracks']:
             yield YouTubeMusicTrack(track)
 
-    def get_song_videos(self, track: YouTubeMusicTrack):
-        found_track = self.search_ytm_song(track)
-        res = [track]
-        if found_track and found_track != track:
-            res.append(track)
+    def get_search_result(self, track: YouTubeMusicTrack):
+        """
+        Возвращает список треков приведенных к типу DBTrack.\n
+        Если при поиске нашелся тот же id то вернет список из 1 объекта [ytm_track].\n
+        Если при поиске нашелся другой id то вернет список из 2 объектов [yt_track, ytm_track].\n
+        Если поиск завершился с ошибкой то вернет список из 1 объекта [yt_track].
+        :raise SearchingError: если началный трек недоступен и по доступной информации поиск завершился с ошибкой
+        """
+        if track.duration > 900:
+            return [track.to_db_track(state=3)]  # трек скорее всего является сборником
+        res = []
+        try:
+            song_track = self.search_ytm_song(track)
+        except SearchingError:
+            if track.track_id:
+                res.append(track.to_db_track(state=2))  # не нашлось song аналога, но трек доступен
+            else:
+                raise SearchingError
+        else:
+            res.append(song_track.to_db_track(state=1))  # найденный трек типа song
+            if track.track_id and track != song_track:
+                res.append(track.to_db_track(state=0))  # есть аналог типа song
         return res
 
     def search_ytm_song(self, track: YouTubeMusicTrack) -> YouTubeMusicTrack:
@@ -35,7 +52,7 @@ class YTMSearcher:
         ]
         for query in query_value:
             try:
-                search_result = self.search_song_by_query(*query)
+                search_result = self._search_song_by_query(*query)
             except SearchingError:
                 pass
             else:
@@ -57,7 +74,7 @@ class YTMSearcher:
         }
         return track
 
-    def search_song_by_query(self, query: str, ignore_spelling: bool = False):
+    def _search_song_by_query(self, query: str, ignore_spelling: bool = False):
         """
         :return: Возвращает первый из найденных треков
         :raise SearchingError: если поиск завершился с ошибкой

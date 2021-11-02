@@ -5,7 +5,7 @@ from app.run import add_playlist_to_db, show_data
 
 def main(playlist_id: str):
     table = TracksTable()
-    # add_playlist_to_db(table, playlist_id)
+    add_playlist_to_db(table, playlist_id)
     show_data(table.get_all_data())
     # show_data_sp(table_.get_data_by_param('search_result', 1))
     # search_dz(table_.get_data_by_param('search_result', 1))

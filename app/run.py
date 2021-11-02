@@ -4,23 +4,19 @@ from app.usefull.exceptions import SearchingError
 from app.youtube.yt_handler import YTMSearcher
 from app.database.db_track import DBTrack
 from app.youtube import exceptions as ex
-from app.youtube.youtube_music_track import YouTubeMusicTrack
 from app.deezer_.search_dz import DZSearcher
 
 
 def add_playlist_to_db(table: TracksTable, playlist_id: str):
     with open('Unavailable_videos.txt', 'a', encoding='utf-8') as log:
         yt = YTMSearcher()
-        for i, track in enumerate(yt.get_tracks_from_playlist(playlist_id)):
+        for i, track in enumerate(yt.get_track_list_from_playlist(playlist_id)):
             if not table.contains_id(track.track_id):
                 try:
-                    song_video = yt.search_ytm_song(track)
+                    res = yt.get_search_result(track)
                 except ex.SearchingError:
                     log.write(str(track) + '\n')
                 else:
-                    res = [track.to_db_track(state=0)]
-                    if song_video != track:
-                        res.append(song_video.to_db_track(state=1))
                     table.add_tracks(res)
             print(f"Added {i+1} tracks...")
 
