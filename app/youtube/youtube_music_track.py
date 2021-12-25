@@ -10,11 +10,13 @@ SEP = ' -|- '
 
 class YouTubeMusicTrack:
     def __init__(self, track: dict):
+        # print(track)
         self.is_available: bool = track['isAvailable']
         self.track_id: str = track['videoId'] if track['videoId'] else ''
         self.title: str = track['title']
         self.artists: list = track['artists']  # 'artists': [{'name': 'STARSET', 'id': 'UCzYd1EYoMbG8tFWQ69Odi4Q'}]
         self.album: str = str(track['album']['name']) if track['album'] else ''
+        self.album_id: str = str(track['album']['id']) if track['album'] else ''
         self.cover_art: str = track['thumbnails'][-1]['url']
         try:
             self.duration: int = calc_duration(track['duration'])
@@ -31,6 +33,10 @@ class YouTubeMusicTrack:
 
     def get_artists_ids(self):
         return [artist['id'] for artist in self.artists]
+
+    def get_artist_info_tmp(self):
+        res = [(artist['id'], artist['name']) for artist in self.artists]
+        return ', '.join([str(e) for e in res])
 
     def get_meta_data(self):
         if not self.meta_name and not self.meta_artist:
@@ -54,12 +60,13 @@ class YouTubeMusicTrack:
             else:
                 meta_name = meta.get("Song")
                 meta_artist = meta.get("Artist")
+                meta_album = meta.get("Album")
                 self.meta_name = meta_name if meta_name else self.title
                 self.meta_artist = meta_artist if meta_artist else self.get_artists_names_str()
 
     def is_equal(self, other):
         """
-        Проверяет что результат поиска соответствует запросу
+        Проверяет что результат поиска и входной трек имеют схожую метадату
         :param other: резльтат поиска
         :return: True if is_equal else False
         """
@@ -68,14 +75,9 @@ class YouTubeMusicTrack:
         return self.has_same_title(other) and self.has_same_artist(other)
 
     def has_same_title(self, other):  # todo
-        if not self.meta_name:
-            n_yt = normalized(self.title)
-        else:
-            n_yt = normalized(self.meta_name)
+        n_yt = normalized(self.meta_name) if self.meta_name else normalized(self.title)
         n_ytm = normalized(other.title)
-        if n_yt.find(n_ytm) != -1:
-            return True
-        if n_ytm.find(n_yt) != -1:
+        if n_yt.find(n_ytm) != -1 or n_ytm.find(n_yt) != -1:
             return True
         return False
 
@@ -110,6 +112,11 @@ class YouTubeMusicTrack:
 
     def __eq__(self, other):
         return self.track_id == other.track_id
+
+    def get_info(self):
+        return self.track_id + SEP + self.title + SEP + self.get_artist_info_tmp() + SEP + '(' + self.album \
+               + ' - ' + self.album_id + ')' + SEP + str(self.duration)
+        # return self.album + ' - ' + self.album_id + ' ' + self.cover_art
 
     def __str__(self):
         return self.track_id + SEP + self.title + SEP + self.get_artists_names_str() + SEP + self.album \

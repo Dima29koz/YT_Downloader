@@ -40,7 +40,11 @@ class TracksTable:
             self.add_track(db_track)
 
     def contains_id(self, video_id: str):
-        if video_id is None:
+        """
+
+        Проверяет было ли видео уже обработано (таблица Video-Song)
+        """
+        if not video_id:
             return False
         with self.con:
             cur = self.con.cursor()

@@ -57,22 +57,14 @@ class YTMSearcher:
                 pass
             else:
                 ytm_track = YouTubeMusicTrack(search_result)
-                if track.is_equal(ytm_track):
+                if track.is_equal(ytm_track):  # todo добавить оптимизацию, хранящую ссылки на уже найденные видео
                     return ytm_track
         raise SearchingError
 
     @staticmethod
     def convert_to_ytm_track(search_result: dict):
-        track = {
-            'isAvailable': True,
-            'videoId': search_result['videoId'],
-            'title': search_result['title'],
-            'artists': search_result['artists'],
-            'album': search_result['album'],
-            'thumbnails': search_result['thumbnails'],
-            'duration': search_result['duration']
-        }
-        return track
+        search_result.update({'isAvailable': True})
+        return search_result
 
     def _search_song_by_query(self, query: str, ignore_spelling: bool = False):
         """
@@ -86,3 +78,24 @@ class YTMSearcher:
             return self.convert_to_ytm_track(search_result[0])
         except IndexError:
             raise SearchingError
+
+    def print_song_lyrics(self, song_id: str):
+        print(self.ytm.get_lyrics(song_id))
+
+    def print_w_playlist(self, song_id):
+        print(self.ytm.get_watch_playlist(song_id)['tracks'][0])
+
+    def print_search_result(self, query):
+        try:
+            print(self._search_song_by_query(*query))
+        except SearchingError:
+            print('Error ' + query[0])
+
+    def print_artist_info(self, query):
+        print(self.ytm.get_artist(query))
+
+    def print_artist_album(self, artist_id, params):
+        print(self.ytm.get_artist_albums(artist_id, params))
+
+    def print_album_info(self, album_id):
+        print(self.ytm.get_album(album_id))
