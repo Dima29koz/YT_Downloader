@@ -1,6 +1,6 @@
 import re
 
-from app.database.db_track import DBTrack
+from app.database.db_object import DBTrack
 from app.usefull.functions import feat_finder, without_feat, artist_splitter, artist_splitter_runtime
 
 

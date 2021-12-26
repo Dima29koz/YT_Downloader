@@ -1,7 +1,7 @@
 from ytmusicapi.ytmusic import YTMusic
 
 from app.youtube.youtube_music_track import YouTubeMusicTrack
-from app.youtube.exceptions import SearchingError
+from app.youtube.exceptions import SearchingError, DurationError
 
 
 class YTMSearcher:
@@ -9,33 +9,32 @@ class YTMSearcher:
         self.ytm = YTMusic()
 
     def get_track_list_from_playlist(self, playlist_id: str):
+        """
+        список треков плейлиста
+        :param playlist_id: pure playlist id ('PL8wnw. . .')
+        :return:
+        """
         playlist = self.ytm.get_playlist(playlist_id, limit=2000)
+        # todo можно забрать информацию о плейлисте (длина, название, ...)
         for track in playlist['tracks']:
             yield YouTubeMusicTrack(track)
 
     def get_search_result(self, track: YouTubeMusicTrack):
         """
-        Возвращает список треков приведенных к типу DBTrack.\n
-        Если при поиске нашелся тот же id то вернет список из 1 объекта [ytm_track].\n
-        Если при поиске нашелся другой id то вернет список из 2 объектов [yt_track, ytm_track].\n
-        Если поиск завершился с ошибкой то вернет список из 1 объекта [yt_track].
-        :raise SearchingError: если началный трек недоступен и по доступной информации поиск завершился с ошибкой
+        Возвращает ytm_track в случае если найден трек,
+        при ошибке поиска вызовет исключение SearchingError
+
+        :raise SearchingError: если не удалось найти track по входной информации;
+        :raise DurationError: если длительность трека больше 900 сек;
         """
         if track.duration > 900:
-            return [track.to_db_track(state=3)]  # трек скорее всего является сборником
-        res = []
+            raise DurationError  # трек скорее всего является сборником
         try:
             song_track = self.search_ytm_song(track)
         except SearchingError:
-            if track.track_id:
-                res.append(track.to_db_track(state=2))  # не нашлось song аналога, но трек доступен
-            else:
-                raise SearchingError
+            raise SearchingError
         else:
-            res.append(song_track.to_db_track(state=1))  # найденный трек типа song
-            if track.track_id and track != song_track:
-                res.append(track.to_db_track(state=0))  # есть аналог типа song
-        return res
+            return song_track
 
     def search_ytm_song(self, track: YouTubeMusicTrack) -> YouTubeMusicTrack:
         """
@@ -91,11 +90,11 @@ class YTMSearcher:
         except SearchingError:
             print('Error ' + query[0])
 
-    def print_artist_info(self, query):
-        print(self.ytm.get_artist(query))
+    def get_artist_info(self, query):
+        return self.ytm.get_artist(query)
 
     def print_artist_album(self, artist_id, params):
         print(self.ytm.get_artist_albums(artist_id, params))
 
-    def print_album_info(self, album_id):
-        print(self.ytm.get_album(album_id))
+    def get_album_info(self, album_id):
+        return self.ytm.get_album(album_id)

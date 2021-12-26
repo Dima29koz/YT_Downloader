@@ -1,16 +1,14 @@
 from pytube import YouTube
 from pytube.exceptions import VideoUnavailable
 
-from app.database.db_track import DBTrack
-from app.usefull.functions import normalized, artist_splitter_runtime, calc_duration, feat_finder, artist_splitter, \
-    artist_fixer
+from app.database.db_object import DBTrack
+from app.usefull.functions import normalized, artist_splitter_runtime, calc_duration
 
 SEP = ' -|- '
 
 
 class YouTubeMusicTrack:
     def __init__(self, track: dict):
-        # print(track)
         self.is_available: bool = track['isAvailable']
         self.track_id: str = track['videoId'] if track['videoId'] else ''
         self.title: str = track['title']
@@ -24,6 +22,7 @@ class YouTubeMusicTrack:
             self.duration: int = 0
         self.meta_name: str = ''
         self.meta_artist: str = ''
+        self.tr_number: int = 1
 
     def get_artists_names(self):
         return [artist['name'] for artist in self.artists]
@@ -122,18 +121,9 @@ class YouTubeMusicTrack:
         return self.track_id + SEP + self.title + SEP + self.get_artists_names_str() + SEP + self.album \
                + SEP + str(self.duration)
 
-    def to_db_track(self, state):  # todo
+    def to_db_track(self):  # todo
         norm_title = self.title.replace('[', '(').replace(']', ')')
-        feat = feat_finder(norm_title)
-        if feat != '':
-            title = norm_title.replace(feat, '').strip()
-            feat_arts = feat.replace('feat.', '')[1:-1]
-        else:
-            title = norm_title
-            feat_arts = ''
         return DBTrack(track_id=self.track_id,
-                       state=state,
-                       title=title,
-                       artists=', '.join(artist_splitter(artist_fixer(self.get_artists_names()) + [feat_arts])),
-                       album=self.album,
-                       cover_art=self.cover_art)
+                       title=norm_title,
+                       track_number=self.tr_number,
+                       duration=self.duration)

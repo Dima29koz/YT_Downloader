@@ -3,7 +3,7 @@ from spotipy.oauth2 import SpotifyClientCredentials
 from typing import List
 
 from app.spotify.spotify_track import SpotifyTrack
-from app.database.db_track import DBTrack
+from app.database.db_object import DBTrack
 from app.usefull.functions import without_feat, soft_normalized
 
 spotify = spotipy.Spotify(

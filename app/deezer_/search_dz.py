@@ -1,6 +1,6 @@
 import deezer
 from app.usefull.exceptions import SearchingError
-from app.database.db_track import DBTrack
+from app.database.db_object import DBTrack
 from app.deezer_.deezer_track import DeezerTrack
 from app.usefull.functions import soft_normalized, artist_splitter_runtime
 from app.usefull.search_rating_calculator import SRCalculator
