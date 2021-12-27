@@ -24,8 +24,8 @@ class DBHandler:
     def find_track_data(self, track: YouTubeMusicTrack, log):
         try:
             ytm_track = self.yt.get_search_result(track)
-        except ex.SearchingError:  # todo обработать другие исключения,
-            # плохо писать в лог то что не нашлось, но доступно
+        except ex.SearchingError:
+            # todo обработать другие исключения,плохо писать в лог то что не нашлось, но доступно
             log.write(str(track) + '\n')
         else:
             if not self.table.contains_track(ytm_track.track_id):

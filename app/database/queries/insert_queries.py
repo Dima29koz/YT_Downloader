@@ -4,7 +4,7 @@ def add_genre(genre_id: int, genre_name: str):
     return query
 
 
-def add_album_type(type_id:int, album_type: str):
+def add_album_type(type_id: int, album_type: str):
     query = f"""insert ignore into album_type values ({type_id}, '{album_type}');"""
     return query
 
@@ -13,7 +13,7 @@ def add_track(track_id: str, title: str, year: int, tr_number: int, disk_number:
               genre_id: int, lyrics: str, duration: int):
     query = f"""
         insert ignore into track values 
-        ('{track_id}', '{title}', 
+        ('{track_id}', "{title}", 
         {f"{year}" if year else 'NULL'},
         {tr_number}, {disk_number}, 
         {f"{genre_id}" if genre_id else 'NULL'}, 
@@ -45,7 +45,7 @@ def add_artist(id_artist: str, name: str, cover: str):
 def add_link_album_track(id_album: str, id_track: str):
     query = f"""
         insert ignore into album_track (id_track, id_album) values 
-        ('{id_album}', '{id_track}');"""
+        ('{id_track}', '{id_album}');"""
     return query
 
 
