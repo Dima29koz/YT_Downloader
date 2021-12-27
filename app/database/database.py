@@ -1,4 +1,4 @@
-from mysql.connector import connect, Error
+from mysql.connector import connect, Error, DatabaseError
 from app.database.db_object import DBTrack, DBAlbum, DBArtist
 import app.database.queries.insert_queries as insert
 import app.database.queries.select_query as select
@@ -109,6 +109,32 @@ class DataBase:
         if type_id:
             return type_id[0]
         return None
+
+    def check_user(self, email: str, password: str):
+        cur = self.con.cursor()
+        cur.execute(select.get_user_data_by_email(email))
+        user = cur.fetchone()
+        if user and user[1] == password:
+            return True
+        return False
+
+    def add_user(self, email: str, login: str, password: str):
+        cur = self.con.cursor()
+        try:
+            cur.execute(insert.add_user(email, login, password))
+        except DatabaseError:
+            return False
+        else:
+            self.con.commit()
+            return True
+
+    def get_favorite(self, email: str):
+        cur = self.con.cursor()
+        cur.execute(select.get_track_info_by_user(email))
+        tr_info = cur.fetchall()
+        if tr_info:
+            return tr_info
+        return []
 
     def get_data_by_param(self, param, value):
         """

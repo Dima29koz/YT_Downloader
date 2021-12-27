@@ -1,7 +1,7 @@
 from app.database.database import DataBase
 from app.youtube.yt_handler import YTMSearcher
 from app.youtube.youtube_music_track import YouTubeMusicTrack
-from app.database.db_object import DBTrack, DBArtist, DBAlbum
+from app.database.db_object import DBArtist, DBAlbum
 from app.youtube import exceptions as ex
 
 
@@ -55,3 +55,12 @@ class DBHandler:
             self.table.add_link_track_artist(ytm_track.track_id, artist_id)
             self.table.add_link_artist_album(artist_id, ytm_track.album_id)
         self.table.add_link_album_track(ytm_track.album_id, ytm_track.track_id)
+
+    def validate_user(self, login: str, password: str):
+        return self.table.check_user(login, password)
+
+    def create_user(self, email: str, login: str, password: str):
+        return self.table.add_user(email, login, password)
+
+    def get_favorite(self, email: str):
+        return self.table.get_favorite(email)

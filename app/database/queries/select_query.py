@@ -67,3 +67,13 @@ def get_album_info_by_artist_name(artist_name: str):
         artist_album.id_artist = artists.id_artist;
     """
     return query
+
+
+def get_user_data_by_email(email: str):
+    """получить информацию о пользователе по email"""
+    query = f"""
+            select email, password from user
+            where
+            email='{email}';
+        """
+    return query

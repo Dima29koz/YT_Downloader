@@ -1,10 +1,12 @@
 from app.database.database import DataBase
 from app.run import DBHandler
+from app.interface.ui import UI
 
-
-def main(playlist_id: str):
+def main():
     db_h = DBHandler(DataBase())
-    db_h.add_playlist_to_db(playlist_id)
+    # db_h.add_playlist_to_db(playlist_id)
+    UI(db_h)
+
     # show_data(table.get_all_data())
     # show_data_sp(table_.get_data_by_param('search_result', 1))
     # search_dz(table_.get_data_by_param('search_result', 1))
@@ -15,5 +17,6 @@ def main(playlist_id: str):
 
 
 if __name__ == "__main__":
-    test_id = 'PL8wnwtwgCjP_GKWAxsapNIrBNY3tu41g6'
-    main(test_id)
+    # test_id = 'PL8wnwtwgCjP_GKWAxsapNIrBNY3tu41g6'
+    main()
+
