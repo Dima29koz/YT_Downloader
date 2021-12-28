@@ -1,3 +1,5 @@
-/Data/
 /venv/
 /.idea/
+*.exe
+*.txt
+/resources/
