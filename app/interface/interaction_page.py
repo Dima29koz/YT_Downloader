@@ -4,14 +4,16 @@ from tkinter.simpledialog import askstring
 import tkinter.ttk as ttk
 from functools import partial
 
-from app.run import DBHandler
+from app.db_interaction import DBHandler
 
 
 class InteractionPage:
-    def __init__(self, canvas, db_h: DBHandler):
+    def __init__(self, canvas, db_h: DBHandler, get_active_user):
         self.canvas = canvas
         self.db_h = db_h
+        self.user_email = get_active_user
         self.menu = tk.Menu(self.canvas, tearoff=0)
+        self.tracks = []
 
     def draw(self, get_favorite):
         columns = ("#1", "#2", "#3")
@@ -25,7 +27,7 @@ class InteractionPage:
 
         self.menu.add_command(label="Обновить", command=partial(self.on_update, tr_table, get_favorite))
         tr_table.bind("<Button-3>", self.show_menu)
-        tr_table.bind("<<TreeviewSelect>>", partial(self.get_selection, tr_table))
+        # tr_table.bind("<<TreeviewSelect>>", partial(self.get_selection, tr_table))
 
         add_button = tk.Button(self.canvas, text="Добавить плейлист", command=self.on_click)
 
@@ -37,27 +39,28 @@ class InteractionPage:
         add_button.pack()
         f1.pack()
 
-    @staticmethod
-    def get_selection(event, tr_table):  # todo
-        for selection in tr_table.selection():
-            item = tr_table.item(selection)
-            last_name, first_name, email = item["values"][0:3]
-            text = "Выбор: {}, {} <{}>"
-            print(text.format(last_name, first_name, email))
+    # @staticmethod
+    # def get_selection(event, tr_table):  # todo
+    #     for selection in tr_table.selection():
+    #         item = tr_table.item(selection)
+    #         last_name, first_name, email = item["values"][0:3]
+    #         text = "Выбор: {}, {} <{}>"
+    #         print(text.format(last_name, first_name, email))
 
     def show_menu(self, e):
         self.menu.post(e.x_root, e.y_root)
 
-    @staticmethod
-    def on_update(tr_table, get_favorite):  # todo дюпает список
+    def on_update(self, tr_table: ttk.Treeview, get_favorite):
         tracks = get_favorite()
         if tracks:
-            for track in tracks:
+            for track in [track for track in tracks if track not in self.tracks]:
+
                 tr_table.insert("", tk.END, values=track)
+        self.tracks = tracks
 
     def on_click(self):
+        # todo добавить статус добавления
         url = askstring('playlist url', 'Введите ссылку на плейлист')
         playlist_id = re.split(r'list=', re.sub(r'&fea[\S]*', '', url))[1]
         if playlist_id:
-            self.db_h.add_playlist_to_db(playlist_id)
-            # todo добавить добавление в избаранное
+            self.db_h.add_playlist_to_db(playlist_id, self.user_email())

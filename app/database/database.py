@@ -33,18 +33,18 @@ class DataBase:
         cur.execute(insert.add_album(*db_album.get()))
         self.con.commit()
 
-    def contains_video(self, video_id: str):
+    def contains_video(self, video_id: str) -> str | None:
         """
         Проверяет было ли видео уже обработано (таблица Video-Song)
         """
         if not video_id:
-            return False
+            return
 
         cur = self.con.cursor()
-        cur.execute(f"SELECT * FROM video_song where id_Video='{video_id}'")
-        if cur.fetchone():
-            return True
-        return False
+        cur.execute(f"SELECT id_song FROM video_song where id_Video='{video_id}'")
+        track = cur.fetchone()
+        if track:
+            return track[0]
 
     def contains_track(self, track_id: str):
         """
@@ -78,6 +78,13 @@ class DataBase:
             return False
         cur = self.con.cursor()
         cur.execute(f"SELECT * FROM album where id_album='{album_id}'")
+        if cur.fetchone():
+            return True
+        return False
+
+    def contains_favorite(self, email: str, track_id: str):
+        cur = self.con.cursor()
+        cur.execute(f"SELECT * FROM favorite where user_email='{email}' and id_track='{track_id}'")
         if cur.fetchone():
             return True
         return False
@@ -136,69 +143,8 @@ class DataBase:
             return tr_info
         return []
 
-    def get_data_by_param(self, param, value):
-        """
-        Возвращает все записи из БД по заданному параметру.
-
-        :param param: name of parameter
-        :param value: value of parameter
-        :return: list[MusicTrack]
-        """
-        with self.con:
+    def add_favorite(self, track_id: str, email: str):
+        if not self.contains_favorite(email, track_id):
             cur = self.con.cursor()
-            cur.execute(f"SELECT * FROM {self.filename} where {param}='{value}'")
-            rows = cur.fetchall()
-            cur.close()
-            tracks = []
-            for row in rows:
-                tracks.append(self.__make_db_track_from_db_row(row))
-            return tracks
-
-    def get_all_data(self):
-        """
-        Возвращает все записи из БД.
-
-        :return: list[MusicTrack]
-
-        """
-        with self.con:
-            cur = self.con.cursor()
-            cur.execute(f"SELECT * FROM {self.filename}")
-            rows = cur.fetchall()
-            cur.close()
-            tracks = []
-            for row in rows:
-                tracks.append(self.__make_db_track_from_db_row(row))
-            return tracks
-
-    def get_track_by_param(self, param, value):
-        with self.con:
-            cur = self.con.cursor()
-            cur.execute(f"SELECT * FROM {self.filename} where {param}='{value}'")
-            row = cur.fetchone()
-            cur.close()
-            return self.__make_db_track_from_db_row(row)
-
-    @staticmethod
-    def __make_db_track_from_db_row(row):
-        return DBTrack(track_id=row[0], state=row[1], downloaded=row[2], title=row[3],
-                       artists=row[4], album=row[5], release_year=row[6],
-                       total_tracks=row[7], track_number=row[8], genre=row[9],
-                       cover_art=row[10], lyrics=row[11])
-
-# def delete_id(filename: str, video_id):
-#     con = sql.connect(f'{filename}.db')
-#     with con:
-#         cur = con.cursor()
-#         cur.execute(f"DELETE FROM {filename} WHERE id='{video_id}';")
-#         con.commit()
-#         cur.close()
-#
-#
-# def update_id(filename: str, video_id, key, value):
-#     con = sql.connect(f'{filename}.db')
-#     with con:
-#         cur = con.cursor()
-#         cur.execute(f"Update {filename} set '{key}' = '{value}' where id = '{video_id}'")
-#         con.commit()
-#         cur.close()
+            cur.execute(insert.add_favorite_track_to_user(email, track_id))
+            self.con.commit()

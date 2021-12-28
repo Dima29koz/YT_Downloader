@@ -10,14 +10,18 @@ class DBHandler:
         self.table = table
         self.yt = YTMSearcher()
 
-    def add_playlist_to_db(self, playlist_id: str):
+    def add_playlist_to_db(self, playlist_id: str, user_email: str = None):
         with open('Unavailable_videos.txt', 'a', encoding='utf-8') as log:
             amount = 0
             for i, track in enumerate(self.yt.get_track_list_from_playlist(playlist_id)):
-                if not self.table.contains_video(track.track_id):
-                    self.find_track_data(track, log)
+                song_id = self.table.contains_video(track.track_id)
+                if not song_id:
+                    song_id = self.find_track_data(track, log)
                 else:
                     amount += 1
+
+                if user_email and song_id:
+                    self.table.add_favorite(song_id, user_email)
                 print(f"Added {i + 1} tracks...")
             print(f"{amount} track were duplicated")
 
@@ -31,6 +35,7 @@ class DBHandler:
             if not self.table.contains_track(ytm_track.track_id):
                 self.add_data_to_db(ytm_track)
             self.table.add_link_video_song(track.track_id, ytm_track.track_id)
+            return ytm_track.track_id
 
     def add_data_to_db(self, ytm_track: YouTubeMusicTrack):
         # find other info about track

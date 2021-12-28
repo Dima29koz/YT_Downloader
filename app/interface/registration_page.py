@@ -1,6 +1,6 @@
 import tkinter as tk
 
-from app.run import DBHandler
+from app.db_interaction import DBHandler
 from functools import partial
 from app.interface.state import State
 

@@ -1,6 +1,6 @@
 import tkinter as tk
 
-from app.run import DBHandler
+from app.db_interaction import DBHandler
 from functools import partial
 from app.interface.state import State
 
@@ -10,6 +10,7 @@ class LoginPage:
         self.canvas = canvas
         self.db_h = db_h
         self.set_state = set_state
+        self.email: str = ''
 
     def draw(self):
         header_name = tk.Label(self.canvas, text="Вход:", font="Calibri 18")
@@ -39,9 +40,13 @@ class LoginPage:
         f1.pack()
         f2.pack()
 
+    def get_active_user(self):
+        return self.email
+
     def _enter_btn(self, login_e: tk.Entry, password_e: tk.Entry, error_message: tk.Label):
         email = login_e.get()
         if self.db_h.validate_user(email, password_e.get()):
+            self.email = email
             self.set_state(State.interaction_page, email)
         else:
             error_message.grid()

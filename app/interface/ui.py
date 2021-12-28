@@ -1,6 +1,6 @@
 import tkinter as tk
 
-from app.run import DBHandler
+from app.db_interaction import DBHandler
 from app.interface.login_page import LoginPage
 from app.interface.registration_page import RegistrationPage
 from app.interface.interaction_page import InteractionPage
@@ -31,9 +31,10 @@ class UI:
 
         self.tmp_frame.pack(expand=1)
 
-        LoginPage(self.login_frame, self.db_h, self.set_state).draw()
+        lp = LoginPage(self.login_frame, self.db_h, self.set_state)
+        lp.draw()
         RegistrationPage(self.registration_page, self.db_h, self.set_state).draw()
-        InteractionPage(self.interaction_page, self.db_h).draw(self.get_favorite)
+        InteractionPage(self.interaction_page, self.db_h, lp.get_active_user).draw(self.get_favorite)
 
     @staticmethod
     def draw_page(canvas_old, canvas_new):
